@@ -13,6 +13,7 @@
     <el-button @click="goToB">Go to LoginPage</el-button>
     <router-view></router-view>
 
+
   </div>
 </template>
 

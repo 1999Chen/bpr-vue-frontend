@@ -1,4 +1,4 @@
-# testtest
+# bpr-vue-frontend
 
 ## Project setup
 ```
