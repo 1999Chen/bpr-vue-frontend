@@ -8,8 +8,8 @@
     <router-link to="/LoginPage">GO LoginPage</router-link><br>
     <router-link to="/ItemPage">GO item page</router-link><br>
     <router-link to="/AddItemPage">GO add item page</router-link><br>
-    <router-link to="/TestPage">GO test page</router-link><br>
-    <router-link to="/TestPage2">GO test2 page</router-link><br>
+    <router-link to="/CartPage">GO cart page</router-link><br>
+    <router-link to="/TestPage2">GO Search page</router-link><br>
     <el-button @click="goToB">Go to LoginPage</el-button>
     <router-view></router-view>
 

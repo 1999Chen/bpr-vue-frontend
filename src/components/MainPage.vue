@@ -1,16 +1,88 @@
 <template>
-  <div v-if="onLoad">
-    <div v-for="item of itemList" :key="item.name">
-      <a>look here!!!{{ count }}{{ item.name }}
-      </a>
+  <el-container class="content-container" direction="vertical">
+    <div class="top">
+      <!-- 表单输入框开始 -->
+      <el-form ref="ruleFormRef"  label-width="120px" class="input-form"
+               status-icon>
+        <el-form-item label="商品名称" prop="name">
+          <el-input v-model="queryParms.name" />
+        </el-form-item>
+
+
+        <el-form-item label="商品编号" prop="receiveUser">
+          <el-input v-model="queryParms.receiveUser" />
+        </el-form-item>
+
+        <el-form-item label="商品分类" prop="payTime">
+          <el-select v-model="queryParms.payTime" placeholder="请选择分类">
+            <el-option key="2" label="全部" :value="2"></el-option>
+            <el-option key="1" label="是" :value="1"></el-option>
+            <el-option key="0" label="否" :value="0"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="是否上架" prop="payTime">
+          <el-select v-model="queryParms.payTime" placeholder="请选择是否上架">
+            <el-option key="2" label="全部" :value="2"></el-option>
+            <el-option key="1" label="是" :value="1"></el-option>
+            <el-option key="0" label="否" :value="0"></el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="是否过期" prop="payTime">
+          <el-select v-model="queryParms.payTime" placeholder="请选择是否过期">
+            <el-option key="2" label="全部" :value="2"></el-option>
+            <el-option key="1" label="是" :value="1"></el-option>
+            <el-option key="0" label="否" :value="0"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <!-- 表单输入框结束 -->
+
+      <!-- 表单按钮组开始 -->
+      <div class="btns">
+        <el-button type="primary">search</el-button>
+        <el-button type="primary">remove all filters</el-button>
+        <el-button type="primary">新增商品</el-button>
+      </div>
+      <!-- 表单按钮组结束 -->
     </div>
 
-    <el-row>
-      <el-col :span="24">
-        <div class="grid-content bg-purple-dark"></div>
-      </el-col>
-    </el-row>
-  </div>
+    <!-- 表格开始 -->
+    <div class="table">
+      <!-- 表格 -->
+      <el-table ref="multipleTableRef" :data="orderList" style="width: 100%"
+                @selection-change="handleSelectionChange" tooltip-effect="dark">
+        <!-- 多选框 -->
+        <el-table-column type="selection" width="55" />
+        <!-- 商品 -->
+        <el-table-column label="商品" prop="name" width="100">
+          <template #default="scope">
+            <div style="text-align:center;">
+              <el-image :src="scope.row.img" style="width:60px;height:100px;"></el-image>
+            </div>
+            <div style="text-align:center;">
+              {{ scope.row.name }}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="price" prop="price" width="100"></el-table-column>
+        <el-table-column label="sales" prop="saleCount" width="100"></el-table-column>
+        <el-table-column label="Stock" prop="count" width="100"></el-table-column>
+        <el-table-column label="操作" width="100">
+          <template #default="scope">
+            <el-button size="small" :type="scope.row.state?'success':'danger'">{{scope.row.state?"下架":"上架"}}
+            </el-button>
+          </template>
+        </el-table-column>
+        <el-table-column label="更新时间" prop="time"></el-table-column>
+      </el-table>
+
+      <!-- 分页 -->
+      <el-pagination background layout="prev, pager, next" :total="dataTotal" hide-on-single-page />
+    </div>
+    <!-- 表格结束 -->
+  </el-container>
 
   <div v-if="onLoad">
     <el-row>
@@ -45,7 +117,7 @@
 import {itemAPI} from "@/api/item";
 import {useRouter} from "vue-router";
 import {onMounted, reactive, ref, watch} from "vue";
-
+import { Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
 export default {
   name: "MainPage",
   data() {
@@ -59,21 +131,16 @@ export default {
     let count = ref()
     const onLoad = ref(false)
 
-    let items = [
-      // { name: 'Foo',id:'1' },
-      // { name: 'cocacola',id:'2222' },
-      // { name: 'nike',id:'###!!! 33  3' },
-      // { name: 'adidas',id:'4' },
-      // { name: 'boss',id:'5' },
-    ]
+    let items = []
 
-    let testList = [
-      // {name: 'pepsi', id: '1'},
-      // {name: 'cocacola', id: '2222'},
-      // {name: 'nike', id: '###!!! 33  3'},
-      // {name: 'adidas', id: '4'},
-      // {name: 'Amani T-shirt black', id: '5'}
-    ]
+   const queryParms = {
+          name: "", // 商品名称
+          username: "", // 用户名称
+          receiveUser: "", // 收件人
+          payTime: "", // 支付时间
+          sendTime: "", // 发货时间
+          phone: "", // 手机号
+    }
 
 
     function goToItemPage(itemName) {
@@ -159,8 +226,6 @@ export default {
         console.log("pushing it to items " + item.name)
         items.push(item)
 
-        testList.push(item)
-
       }
 
     });
@@ -173,8 +238,7 @@ export default {
       count,
       onLoad,
       change,
-
-      testList,
+      queryParms,
       uploadItem
 
     };

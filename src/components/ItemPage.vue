@@ -60,6 +60,7 @@
 <script>
 
 import {itemAPI} from "@/api/item";
+import {cartAPI} from "@/api/cart";
 import {useRoute} from "vue-router";
 
 // import{getItemInfo} from "@/api/item";
@@ -191,13 +192,11 @@ export default {
     }
 
     const addToCart = () => {
-      if (count.value <= 0) {
-        alert('宝贝不能再减少啦')
-        this.count.value = 0;
+      const itemQuantity = {cartId: 1, itemName: item.name, id: 1,  quantity:count.value
+
       }
-      console.log("oh,he is sub " + baby.value + " and " + age.value + "years")
-      count.value = count.value - 1;
-      console.log("count is " + count.value);
+      cartAPI.addToCart(itemQuantity)
+
     }
 
 

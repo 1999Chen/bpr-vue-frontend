@@ -4,7 +4,7 @@ import MainPage from "@/components/MainPage";
 import LoginPage from "@/components/LoginPage";
 import ItemPage from "@/components/ItemPage";
 import AddItemPage from "@/components/subComponents/AddItemPage";
-import TestPage from "@/components/subComponents/TestPage";
+import CartPage from "@/components/subComponents/CartPage";
 import TestPage2 from "@/components/subComponents/TestPage2";
 
 const router = createRouter({
@@ -37,8 +37,8 @@ const router = createRouter({
             props: true
         },
         {
-            path:"/testpage",
-            component:TestPage,
+            path:"/cartpage",
+            component:CartPage,
             props: true
         },
         {
