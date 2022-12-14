@@ -2,7 +2,7 @@
   <br>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">Homeland market</h3>
+      <h3 class="title">Homeland market {{ store }}</h3>
       <el-form-item prop="username">
         <el-input
             v-model="loginForm.username"
@@ -10,7 +10,7 @@
             auto-complete="off"
             placeholder="username"
         >
-          <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
+          <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
@@ -21,7 +21,7 @@
             placeholder="password"
             v-on:keyup.enter="handleLogin"
         >
-          <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
+          <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
         </el-input>
       </el-form-item>
       <!--      <el-form-item prop="code" v-if="captchaEnabled">-->
@@ -38,7 +38,8 @@
       <!--          <img :src="codeUrl" @click="getCode" class="login-code-img"/>-->
       <!--        </div>-->
       <!--      </el-form-item>-->
-      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">keep the password for me</el-checkbox>
+      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">keep the password for me
+      </el-checkbox>
       <el-form-item style="width:100%;">
         <el-button
             :loading="loading"
@@ -76,13 +77,18 @@
 
 <script>
 // import { getCodeImg } from "@/api/login";
-
+import {userAPI} from "@/api/user";
+import {aqua as ruleFormRef} from "mockjs";
+import {useStore} from 'vuex'
+import {store} from '@/store/store.js'
 
 
 export default {
   name: "LoginPage",
   data() {
     return {
+
+      authData: "",
       codeUrl: "",
       loginForm: {
         username: "admin",
@@ -93,10 +99,10 @@ export default {
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur", message: "please input username" }
+          {required: true, trigger: "blur", message: "please input username"}
         ],
         password: [
-          { required: true, trigger: "blur", message: "please input password" }
+          {required: true, trigger: "blur", message: "please input password"}
         ],
 
       },
@@ -110,7 +116,7 @@ export default {
   },
   watch: {
     $route: {
-      handler: function(route) {
+      handler: function (route) {
         this.redirect = route.query && route.query.redirect;
       },
       immediate: true
@@ -141,6 +147,11 @@ export default {
       // };
     },
     handleLogin() {
+      userAPI.validateLogin('admin', '123').then(res => {
+            console.log("the role is "+res.data)
+            store.role = res.data
+          }
+      )
       // this.$refs.loginForm.validate(valid => {
       //   if (valid) {
       //     this.loading = true;
@@ -166,7 +177,32 @@ export default {
       //     });
       //   }
       // });
+
+
+      //   this.$refs.loginFormRef.validate(async valid => {
+      //     if (!valid) return
+      //     const { data: res } = await userAPI.validateLogin(this.loginForm.username,this.loginForm.password)
+      //     if (res.meta.status !== 200) return this.$message.error('登录失败！')
+      //     console.log(res)
+      //     // res.right为后台返回的的菜单数据
+      //     this.$store.commit('setRightList', res.rights)
+      //     this.$message.success('登录成功')
+      //     this.$router.push('/home')
+      //   })
+      //
+      //    const store = useStore()
+      //    ruleFormRef.value?.validate((valid : boolean) =>{
+      //   if(valid){
+      //     store.dispatch('userModule/login',{...this.loginForm})
+      //   }else{
+      //     console.log('error submit!')
+      //   }
+      // })
+      //
+
     }
+
+
   }
 };
 </script>
@@ -180,6 +216,7 @@ export default {
   background-image: url("../assets/images/login-background.jpg");
   background-size: cover;
 }
+
 .title {
   margin: 0px auto 30px auto;
   text-align: center;
@@ -191,32 +228,39 @@ export default {
   background: #ffffff;
   width: 400px;
   padding: 25px 25px 5px 25px;
+
   .el-input {
     height: 38px;
+
     input {
       height: 38px;
     }
   }
+
   .input-icon {
     height: 39px;
     width: 14px;
     margin-left: 2px;
   }
 }
+
 .login-tip {
   font-size: 13px;
   text-align: center;
   color: #bfbfbf;
 }
+
 .login-code {
   width: 33%;
   height: 38px;
   float: right;
+
   img {
     cursor: pointer;
     vertical-align: middle;
   }
 }
+
 .el-login-footer {
   height: 40px;
   line-height: 40px;
@@ -229,6 +273,7 @@ export default {
   font-size: 12px;
   letter-spacing: 1px;
 }
+
 .login-code-img {
   height: 38px;
 }
