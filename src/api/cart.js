@@ -3,6 +3,18 @@ import axios from "axios";
 import {isThenable} from "@babel/core/lib/gensync-utils/async";
 
 export const cartAPI = {
+        BASE_URL: "cart",
+
+    generateNewCart: async function (userId) {
+        return await axios({
+            url: this.BASE_URL+"/addNewCart",
+            method: 'post',
+            params: {userId:userId}
+        })
+    },
+
+
+
     addToCart: function (itemQuantity) {
         let config = {
             headers: {'Content-Type': "multipart/json, charset=UTF-8"}
@@ -18,12 +30,25 @@ export const cartAPI = {
         })
     },
 
+    async getCartId(userId) {
+        return axios({
+            url: "cart/getCartByUser",
+            method: 'get',
+            params: {userId: userId}
+        });
+
+    },
+
+
     async getAllItemsByCart(cartId) {
-        return await axios({
-            url: "cart/getAllItemsByCart",
+        console.log("cart api starts")
+        let a = await axios({
+            url: "cart/getItemsByCart",
             method: 'get',
             params: {cartId: cartId}
         })
+        console.log("cart api is "+a)
+        return a
 
     },
 
@@ -35,4 +60,13 @@ export const cartAPI = {
         })
 
     },
+
+    async checkOut (cartId) {
+        return await  axios({
+            url: "cart/checkOut",
+            method: 'delete',
+            params: {cartId: cartId}
+        })
+    },
+
 }

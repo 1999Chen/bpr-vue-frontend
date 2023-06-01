@@ -1,95 +1,72 @@
 <template>
   <el-container class="content-container" direction="vertical">
-    <div class="top">
-      <!-- 表单输入框开始 -->
-      <el-form ref="ruleFormRef" :model="queryParms" :rules="rules" label-width="120px" class="input-form"
-               status-icon>
-        <el-form-item label="商品名称" prop="name">
-          <el-input v-model="queryParms.name" />
-        </el-form-item>
-
-        <el-form-item label="商品编号" prop="receiveUser">
-          <el-input v-model="queryParms.receiveUser" />
-        </el-form-item>
-
-        <el-form-item label="商品分类" prop="payTime">
-          <el-select v-model="queryParms.payTime" placeholder="请选择分类">
-            <el-option key="2" label="全部" :value="2"></el-option>
-            <el-option key="1" label="是" :value="1"></el-option>
-            <el-option key="0" label="否" :value="0"></el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="是否上架" prop="payTime">
-          <el-select v-model="queryParms.payTime" placeholder="请选择是否上架">
-            <el-option key="2" label="全部" :value="2"></el-option>
-            <el-option key="1" label="是" :value="1"></el-option>
-            <el-option key="0" label="否" :value="0"></el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="是否过期" prop="payTime">
-          <el-select v-model="queryParms.payTime" placeholder="请选择是否过期">
-            <el-option key="2" label="全部" :value="2"></el-option>
-            <el-option key="1" label="是" :value="1"></el-option>
-            <el-option key="0" label="否" :value="0"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <!-- 表单输入框结束 -->
-
-      <!-- 表单按钮组开始 -->
-      <div class="btns">
-        <el-button type="primary">筛选</el-button>
-        <el-button type="primary">清空筛选</el-button>
-        <el-button type="primary">导出</el-button>
-        <el-button type="primary">新增商品</el-button>
-      </div>
-      <!-- 表单按钮组结束 -->
-    </div>
-
-    <!-- 表格开始 -->
     <div class="table">
       <!-- 表格 -->
       <el-table ref="multipleTableRef" :data="orderList" style="width: 100%"
                 @selection-change="handleSelectionChange" tooltip-effect="dark">
-        <!-- 多选框 -->
-        <el-table-column type="selection" width="55" />
+
         <!-- 商品 -->
-        <el-table-column label="商品" prop="name" width="100">
-          <template #default="scope">
-            <div style="text-align:center;">
-              <el-image :src="scope.row.img" style="width:60px;height:100px;"></el-image>
-            </div>
-            <div style="text-align:center;">
-              {{ scope.row.name }}
+        <el-table-column label="order id" prop="name" width="100"   >
+          <template #default="scope" >
+            <div class ="item" style="text-align:center;"  @click="methods.goToOrderPage(scope.row.orderId)" >
+            {{scope.row.orderId}}
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="价格" prop="price" width="100"></el-table-column>
-        <el-table-column label="销量" prop="saleCount" width="100"></el-table-column>
-        <el-table-column label="库存" prop="count" width="100"></el-table-column>
-        <el-table-column label="退款数量" prop="back" width="100"></el-table-column>
-        <el-table-column label="退款金额" prop="backPrice" width="100"></el-table-column>
-        <el-table-column label="操作" width="100">
-          <template #default="scope">
-            <el-button size="small" :type="scope.row.state?'success':'danger'">{{scope.row.state?"下架":"上架"}}
-            </el-button>
+        <el-table-column label="cart id" prop="name" width="100"   >
+          <template #default="scope" >
+            <div class ="item" style="text-align:center;"  @click="methods.goToOrderPage(scope.row.orderId)" >
+              {{scope.row.cartId}}
+            </div>
           </template>
         </el-table-column>
-        <el-table-column label="管理员" prop="owner" width="100"></el-table-column>
-        <el-table-column label="更新时间" prop="time"></el-table-column>
+        <el-table-column label="user id" prop="price" width="100">
+          <template #default="scope" >
+            <div class ="item" style="text-align:center;"  @click="methods.goToOrderPage(scope.row.orderId)" >
+              {{scope.row.userId}}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="amount" prop="saleCount" width="100" >
+          <template #default="scope" >
+            <div class ="item" style="text-align:center;"  @click="methods.goToOrderPage(scope.row.orderId)" >
+              {{scope.row.amount}}
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column label="date" prop="saleCount" width="250">
+          <template #default="scope" >
+            <div class ="item" style="text-align:center;"   >
+              {{scope.row.date}}
+            </div>
+          </template>
+        </el-table-column>
+
+
       </el-table>
 
       <!-- 分页 -->
-      <el-pagination background layout="prev, pager, next" :total="dataTotal" hide-on-single-page />
+      <el-pagination background  :total="dataTotal" hide-on-single-page
+                     @size-change="handlehSizeChange"
+                     @current-change="handlehCurrentChange"
+                     :current-page="CurrentPage"
+                     :page-sizes="[20, 40, 60, 80, 100]"
+                     :page-size="PageSize"
+                     layout="total, jumper , prev, pager, next, sizes"
+
+                     popper-class="label-popper"
+      />
     </div>
     <!-- 表格结束 -->
   </el-container>
 </template>
 
 <script>
+import {itemAPI} from "@/api/item";
+import {orderAPI} from "@/api/order";
 import { Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
+import {onMounted, reactive, ref} from "vue";
+import {useRouter} from "vue-router";
 // import Mock from "@/tool/Mock"
 export default {
 
@@ -101,43 +78,113 @@ export default {
   data() {
     return {
       // 查询表单
-      queryParms: {
-        name: "", // 商品名称
-        username: "", // 用户名称
-        receiveUser: "", // 收件人
-        payTime: "", // 支付时间
-        sendTime: "", // 发货时间
-        phone: "", // 手机号
-      },
-      // 表单校验
-      rules: {
-        name: [
-          { required: true, message: 'Please input Activity name', trigger: 'blur' },
-          { min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur' },
-        ],
-      },
-      // tab选中的内容
-      activeName: "all",
-      // 数据总数
-      dataTotal: 1000,
-      // 订单数据
-      orderList: [],
+
     }
   },
-  // 页面挂载的时候
-  mounted() {
-    // 初始化商品数据
-    let pageSize = window.innerHeight > 800 ? 5 : 3;
-    console.log(pageSize);
-    // this.orderList = Mock.getGoods(this.$route.params.type, pageSize)
-    console.log(this.orderList)
-  },
 
-  // 路由更新时刷新数据
-  beforeRouteUpdate(to) {
-    let pageSize = window.innerHeight > 800 ? 5 : 3;
-    // this.orderList = Mock.getGoods(to.params.type, pageSize)
+  setup(){
+
+    let router = useRouter();
+    const orderList = reactive([])
+    const itemList = reactive([])
+    const queryParms=reactive({
+      name: "", // 商品名称
+          username: "", // 用户名称
+          receiveUser: "", // 收件人
+          payTime: "", // 支付时间
+          sendTime: "", // 发货时间
+          phone: "", // 手机号
+    })
+    // 表单校验
+    const rules=reactive({
+      name: [
+        { required: true, message: 'Please input Activity name', trigger: 'blur' },
+        { min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur' },
+      ]
+    })
+    // tab选中的内容
+    const activeName = ref("all")
+        // 数据总数
+    const dataTotal = ref(5)
+
+    const onLoad = ref(false)
+
+
+    const methods = {
+
+      beforeRouteUpdate(to) {
+        let pageSize = window.innerHeight > 800 ? 5 : 3;
+        // this.orderList = Mock.getGoods(to.params.type, pageSize)
+      },
+
+      goToOrderPage(orderId){
+        let page_name = "/orderpage";
+        console.log("goto item inging" + orderId)
+        router.push({
+          path: page_name,
+          query: {
+            orderId: orderId
+          },
+          // path: './ItemPage',
+        });
+
+      },
+
+      async request() {
+        // let itemList = []
+        itemList.length = 0
+
+        await itemAPI.getAllItems().then(res => {
+              for (let item of res.data) {
+                itemList.push(item)
+              }
+            }
+        )
+        onLoad.value = true;
+      },
+
+       async requestOrders() {
+         // let itemList = []
+         console.log("request orders ")
+         await orderAPI.getOrderList().then(res => {
+               for (let order of res.data) {
+                 orderList.push(order)
+                 console.log("order id is "+order.orderId)
+                 console.log("order amount is "+order.amount)
+                 console.log("order date is "+order.date)
+               }
+             }
+         )
+         onLoad.value = true;
+       },
+    }
+
+    onMounted(async () => {
+
+      await methods.request()
+      let pageSize = window.innerHeight > 800 ? 5 : 3;
+
+      await methods.requestOrders()
+
+    });
+
+
+        return{
+          orderList,
+          itemList,
+          onLoad,
+          queryParms,
+          rules,
+          activeName,
+          dataTotal,
+          methods
+        }
+
   }
+
+
+
+
 }
 </script>
 

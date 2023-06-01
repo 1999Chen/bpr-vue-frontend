@@ -13,5 +13,43 @@ export const userAPI = {
 
     },
 
+    async getUserInfo(username) {
+        return await axios({
+            url: "user/getUserInfo",
+            method: 'get',
+            params: {username: username}
+        })
+
+    },
+
+
+
+    async validateRole(username) {
+        return await axios({
+            url: "user/validateRole",
+            method: 'get',
+            params: {username: username}
+        })
+
+    },
+
+    async updateUserInfo(user) {
+        return await axios({
+            url: "user/updateUserInfo",
+            method: 'post',
+            data: user
+        })
+
+    },
+
+
+    async registerUser(username,password) {
+        return await axios({
+            url: "user/registerUser",
+            method: 'get',
+            params: {username: username,password:password}
+        })
+
+    },
 
 }

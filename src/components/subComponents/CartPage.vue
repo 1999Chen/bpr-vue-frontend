@@ -33,7 +33,9 @@
               <el-input-number v-model="item.quantity" :min="1" :max="99" @change="handleChange"/>
             </td>
             <td style="color: orangered;font-size: 20px">${{ item.price * item.quantity }}</td>
-            <td>删除</td>
+            <el-button @click="methods.removeFromCart()">
+              Remove
+            </el-button>
           </tr>
           </tbody>
         </table>
@@ -51,7 +53,6 @@
         </div>
         <div>
           <el-button @click="dialogVisible = true">check out</el-button>
-
           <el-dialog
               title="Check out"
               v-model="dialogVisible"
@@ -63,7 +64,7 @@
             <template #footer>
     <span class="dialog-footer">
       <el-button @click="dialogVisible = false">Not yet</el-button>
-      <el-button type="primary" @click="dialogVisible = false">Yes</el-button>
+      <el-button type="primary"  @click="methods.checkOut()">Yes</el-button>
     </span>
             </template>
           </el-dialog>
@@ -82,10 +83,16 @@ import {reactive, toRefs, watch, computed, ref, onMounted} from "vue";
 import {cartAPI} from "@/api/cart";
 import {itemAPI} from "@/api/item";
 import { ElMessageBox } from 'element-plus'
+import {orderAPI} from "@/api/order";
 
 export default {
   name: "CartPage",
   setup() {
+
+    const a = 0;
+
+    const userId = ref(a);
+    const cartId = ref(a)
     const dialogVisible = ref(false)
     let data = reactive({
       //是否全选
@@ -103,8 +110,15 @@ export default {
     let cartList = reactive([])
     const methods = {
 
-      getCartInfo(cartId) {
-        cartAPI.getAllItemsByCart(cartId).then(resOfGetAllItemsByCart => {
+      async getCartId(userId) {
+        cartId.value = await cartAPI.getCartId(userId)
+        // cartId.value = 1
+      },
+
+      async getCartItems(cartId) {
+        console.log("user ID IS "+ userId.value)
+        console.log("cart ID IS "+ cartId.value)
+        cartAPI.getAllItemsByCart(cartId.data).then(resOfGetAllItemsByCart => {
           cartList.length = 0
           for (let itemQuantity of resOfGetAllItemsByCart.data) {
             console.log("data.quantity" + resOfGetAllItemsByCart.data.quantity)
@@ -123,24 +137,6 @@ export default {
         console.log("cartList" + cartList)
       },
 
-
-      goCheck(item) {
-        //数值是点击之前的值 所以要取反
-        //定义一个长度
-        let length = 1
-        cartList.forEach((i) => {
-          if (i.checked) {
-            length++
-          }
-        })
-
-        if (length === cartList.length) {
-          data.checkAll = true
-        } else {
-          data.checkAll = false
-        }
-
-      },
 
       goCheckAll() {
         //数值是点击之前的值 所以要取反
@@ -173,14 +169,11 @@ export default {
       },
 
       checkOut() {
-        let checkOutList = []
-        cartList.forEach((item) => {
-          if (item.checked){
-            checkOutList.push(item)
-          }
-        })
+        cartAPI.checkOut(1)
+        orderAPI.addOrder(cartId,data.totalprice)
+        console.log("remove check out")
+        dialogVisible.value = false
       },
-
 
 
     }
@@ -189,10 +182,10 @@ export default {
       let totalprice = 0
 
       cartList.forEach((item) => {
-        if (item.checked) {
+
           totalprice += parseInt(item.price) * item.quantity
           console.log("total price is " + totalprice)
-        }
+
       })
       return totalprice
     })
@@ -214,34 +207,27 @@ export default {
 
     let numValue = ref(0)
 
-    onMounted(() => {
+    onMounted(async () => {
 
-      methods.getCartInfo(1)
+      userId.value = 1
+      await methods.getCartId(userId.value)
+      // cartId.value = 1
+
+      methods.getCartItems(cartId.value)
       numValue = tbody.value.offsetHeight + tbody.value.offsetTop
       //获取滚动条的高度
       // window.addEventListener('scroll',handleScroll,true)
     })
 
-    /*
-    function handleScroll(){
-      let top = Math.floor(document.body.scrollTop || document.documentElement.scrollTop || window.pageYOffset)
-      if(top < (numValue - 132)){
-        drag.value.style = 'position: fixed;\n' +
-              '    bottom: 0;\n' +
-              '    z-index: 10;\n' +
-              '    width: 1250px;'
-        }else {
-        drag.value.style = ' '
-      }
-    }*/
-
     return {
+      userId,
+      cartId,
       ...toRefs(data),
       cartList,
       dialogVisible,
       methods,
       drag,
-      tbody
+      tbody,
     }
 
   },
@@ -279,7 +265,7 @@ table thead {
 }
 
 table thead tr {
-  box-shadow: #fcdcdc 15px 15px 0px;
+  //box-shadow: #fcdcdc 15px 15px 0px;
   border-bottom: 1px solid #cbc5c5;
   background: #ebebeb;
   border-radius: 10px;
@@ -291,7 +277,7 @@ table thead tr {
 }
 
 table thead tr td {
-  border-right: 1px solid rosybrown;
+  //border-right: 1px solid rosybrown;
   flex: 1;
 }
 
@@ -311,7 +297,7 @@ tbody .imgbox img {
 
 table tbody tr {
   padding: 20px 10px;
-  border-bottom: 1px solid rosybrown;
+  //border-bottom: 1px solid rosybrown;
   height: 100px;
   display: flex;
   justify-content: space-between;
@@ -346,7 +332,7 @@ table tbody tr td:nth-of-type(2) {
   width: 70px;
   height: 40px;
   border-radius: 10px;
-  background: antiquewhite;
+  //background: antiquewhite;
   color: white;
   font-weight: bolder;
   cursor: pointer;

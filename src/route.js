@@ -9,6 +9,8 @@ import TestPage2 from "@/components/subComponents/TestPage2";
 import ErrorAuth from "@/components/error/ErrorAuth"
 
 import {store} from '@/store/store.js'
+import OrderPage from "@/components/subComponents/OrderPage.vue";
+import RegisterPage from "@/components/RegisterPage.vue";
 
 
 const router = createRouter({
@@ -38,26 +40,41 @@ const router = createRouter({
             path: "/itempage",
             component: ItemPage,
             props: true,
-            meta: {requiresAuth: true}
+            meta: {requiresAuth: false, requiredAdmin: false}
         },
         {
             path: "/additempage",
             component: AddItemPage,
             props: true,
-            meta: {requiresAuth: true}
+            meta: {requiresAuth: false, requiredAdmin: true}
         },
         {
             path: "/cartpage",
             component: CartPage,
             props: true,
-            meta: {requiresAuth: false}
+            meta: {requiresAuth: true, requiredAdmin: false}
+        },
+        {
+            path: "/orderpage",
+            component: OrderPage,
+            props: true,
+            meta: {requiresAuth: true, requiredAdmin: true}
         },
         {
             path: "/testpage2",
             component: TestPage2,
             props: true,
-            meta: {requiresAuth: true}
+            meta: {requiresAuth: false}
         },
+
+        {
+            path: "/Registerpage",
+            component: RegisterPage,
+            props: true,
+            meta: {requiresAuth: false}
+        },
+
+
         {
             path: "/errorauth",
             component: ErrorAuth,
@@ -73,15 +90,24 @@ router.beforeEach((to, from, next) => {
 //   if (getAuth().currentUser)
 //
 // }
-    console.log("requires auth？" + to.meta.requiresAuth)
-    if (to.meta.requiresAuth && store.role === 'guest') {
-        console.log("store role is " + store.role + " and you're not allowed")
-        next('/errorauth')
 
-    } else {
-        console.log("store role is " + store.role + " and you're allowed")
+    if (!to.meta.requiresAuth) {
         next()
+    } else if (!meta.requiredAdmin) {
+        if (sessionStorage.getItem('role')!=null) {
+            next()
+        } else next('/errorauth')
+    } else {
+        if (sessionStorage.getItem('role') === 'admin') {
+            next()
+        } else next('/errorauth')
     }
+
+    // if (to.meta.requiresAuth && sessionStorage.getItem('role') === 'admin') {
+    //     next('/errorauth')
+    // } else {
+    //
+    // }
 })
 
 

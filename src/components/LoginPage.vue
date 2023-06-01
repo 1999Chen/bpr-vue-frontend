@@ -5,17 +5,18 @@
       <h3 class="title">Homeland market {{ store }}</h3>
       <el-form-item prop="username">
         <el-input
-            v-model="loginForm.username"
+            v-model="loginParams.username"
             type="text"
             auto-complete="off"
             placeholder="username"
         >
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
         </el-input>
+
       </el-form-item>
       <el-form-item prop="password">
         <el-input
-            v-model="loginForm.password"
+            v-model="loginParams.password"
             type="password"
             auto-complete="off"
             placeholder="password"
@@ -24,47 +25,23 @@
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
         </el-input>
       </el-form-item>
-      <!--      <el-form-item prop="code" v-if="captchaEnabled">-->
-      <!--        <el-input-->
-      <!--          v-model="loginForm.code"-->
-      <!--          auto-complete="off"-->
-      <!--          placeholder="validation code maybe"-->
-      <!--          style="width: 63%"-->
-      <!--          @keyup.enter.native="handleLogin"-->
-      <!--        >-->
-      <!--          <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />-->
-      <!--        </el-input>-->
-      <!--        <div class="login-code">-->
-      <!--          <img :src="codeUrl" @click="getCode" class="login-code-img"/>-->
-      <!--        </div>-->
-      <!--      </el-form-item>-->
-      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">keep the password for me
-      </el-checkbox>
+
+
       <el-form-item style="width:100%;">
         <el-button
             :loading="loading"
             size="medium"
             type="primary"
             style="width:100%;"
-            v-on:click="handleLogin"
+            @click="methods.handleLogin()"
         >
 
-          <span v-if="!loading">Sign in</span>
-          <span v-else>signing in...</span>
-        </el-button>
-        <el-button
-            :loading="loading"
-            size="medium"
-            type="primary"
-            style="width:100%;"
-            v-on:click="handleLogin"
-        >
+          <span >Sign in</span>
 
-          <span v-if="!loading">Sign in222222</span>
-          <span v-else>signing in...</span>
         </el-button>
+
         <div style="float: right;" v-if="register">
-          <router-link class="link-type" :to="'/register'">立即注册</router-link>
+          <router-link class="link-type" :to="'/register'">Sign up now!</router-link>
         </div>
       </el-form-item>
     </el-form>
@@ -76,11 +53,13 @@
 </template>
 
 <script>
-// import { getCodeImg } from "@/api/login";
+
 import {userAPI} from "@/api/user";
-import {aqua as ruleFormRef} from "mockjs";
-import {useStore} from 'vuex'
-import {store} from '@/store/store.js'
+import {cartAPI} from "@/api/cart";
+
+import {onMounted, reactive} from "vue";
+import {useRouter} from "vue-router";
+
 
 
 export default {
@@ -114,96 +93,70 @@ export default {
       redirect: undefined
     };
   },
-  watch: {
-    $route: {
-      handler: function (route) {
-        this.redirect = route.query && route.query.redirect;
+
+
+  setup(){
+
+    let router = useRouter();
+    const loginParams = reactive({
+      username: "",
+      password: ""
+    })
+
+    const methods  ={
+      async handleLogin() {
+
+          await userAPI.validateLogin(loginParams.username, loginParams.password).then(async res => {
+
+            if (res.data === 1) {
+
+              await methods.validateUserRole(loginParams.username)
+              methods.goToMainPage()
+
+            }
+          })
       },
-      immediate: true
-    }
-  },
-  created() {
-    // this.getCode();
-    this.getCookie();
-  },
-  methods: {
-    getCode() {
-      // getCodeImg().then(res => {
-      //   this.captchaEnabled = res.captchaEnabled === undefined ? true : res.captchaEnabled;
-      //   if (this.captchaEnabled) {
-      //     this.codeUrl = "data:image/gif;base64," + res.img;
-      //     this.loginForm.uuid = res.uuid;
-      //   }
-      // });
-    },
-    getCookie() {
-      // const username = Cookies.get("username");
-      // const password = Cookies.get("password");
-      // const rememberMe = Cookies.get('rememberMe')
-      // this.loginForm = {
-      //   username: username === undefined ? this.loginForm.username : username,
-      //   password: password === undefined ? this.loginForm.password : decrypt(password),
-      //   rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
-      // };
-    },
-    handleLogin() {
-      userAPI.validateLogin('admin', '123').then(res => {
-            console.log("the role is "+res.data)
-            store.role = res.data
-          }
-      )
-      // this.$refs.loginForm.validate(valid => {
-      //   if (valid) {
-      //     this.loading = true;
-      //     this.loginForm.rememberMe = false;
-      //     if (this.loginForm.rememberMe) {
-      //       Cookies.set("username", this.loginForm.username, { expires: 30 });
-      //       Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
-      //       Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 });
-      //     } else {
-      //       Cookies.remove("username");
-      //       Cookies.remove("password");
-      //       Cookies.remove('rememberMe');
-      //
-      //
-      //     }
-      //     this.$store.dispatch("Login", this.loginForm).then(() => {
-      //       this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
-      //     }).catch(() => {
-      //       this.loading = false;
-      //       if (this.captchaEnabled) {
-      //         this.getCode();
-      //       }
-      //     });
-      //   }
-      // });
+
+      async validateUserRole() {
+        await userAPI.validateRole(loginParams.username).then(res => {
+          sessionStorage.setItem('role',res.data);
+        })
+      },
+
+      async registerUser() {
+
+          await userAPI.registerUser(loginParams.username,loginParams.password).then(async res => {
+            if (res.data === 1) {
+              await userAPI.getUserInfo(loginParams.username).then(async res1 => {
+                await cartAPI.generateNewCart(res1.data.userId)
+              })
+            }
+          })
+      },
 
 
-      //   this.$refs.loginFormRef.validate(async valid => {
-      //     if (!valid) return
-      //     const { data: res } = await userAPI.validateLogin(this.loginForm.username,this.loginForm.password)
-      //     if (res.meta.status !== 200) return this.$message.error('登录失败！')
-      //     console.log(res)
-      //     // res.right为后台返回的的菜单数据
-      //     this.$store.commit('setRightList', res.rights)
-      //     this.$message.success('登录成功')
-      //     this.$router.push('/home')
-      //   })
-      //
-      //    const store = useStore()
-      //    ruleFormRef.value?.validate((valid : boolean) =>{
-      //   if(valid){
-      //     store.dispatch('userModule/login',{...this.loginForm})
-      //   }else{
-      //     console.log('error submit!')
-      //   }
-      // })
-      //
+      goToMainPage(){
+        let page_name = "/mainpage";
 
+        router.push({
+          path: page_name,
+
+        });
+      }
     }
 
+    onMounted(async () => {
+      console.log(" session storage  is "+sessionStorage.getItem('role'))
+    })
 
-  }
+    return {
+      loginParams,
+      methods
+    }
+  },
+
+
+
 };
 </script>
 

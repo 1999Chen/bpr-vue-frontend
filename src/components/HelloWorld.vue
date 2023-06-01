@@ -1,16 +1,18 @@
 <template>
   <div class="hello">
-    <a>this is hello world</a>
-    <router-link to="/">Go home</router-link><br>
-    <router-link to="/about">GO there</router-link><br>
-    <router-link to="/HomePage">GO homepage</router-link><br>
-    <router-link to="/MainPage">GO MainPage</router-link><br>
-    <router-link to="/LoginPage">GO LoginPage</router-link><br>
-    <router-link to="/ItemPage">GO item page</router-link><br>
-    <router-link to="/AddItemPage">GO add item page</router-link><br>
-    <router-link to="/CartPage">GO cart page</router-link><br>
-    <router-link to="/TestPage2">GO Search page</router-link><br>
-    <el-button @click="goToB">Go to LoginPage</el-button>
+    <router-link to="/Registerpage">Go Registerpage</router-link>
+    <router-link to="/testpage2">GO orders page</router-link>
+    <router-link to="/OrderPage">GO OrderPage</router-link>
+    <router-link to="/HomePage">GO homepage</router-link>
+    <router-link to="/MainPage">GO MainPage</router-link>
+    <router-link to="/LoginPage">GO LoginPage</router-link>
+    <router-link to="/ItemPage">GO item page</router-link>
+    <router-link to="/AddItemPage">GO add item page</router-link>
+    <router-link to="/CartPage">GO cart page</router-link>
+    <router-link to="/TestPage2">GO Search page</router-link>
+    <br>
+    <br>
+
     <router-view></router-view>
 
 

@@ -1,11 +1,14 @@
 <template>
-  <el-form ref="item" :model="item" :rules="loginRules" class="login-form">
+
+
+  <el-form ref="itemInfo" v-model="item" :rules="loginRules" class="login-form">
     <h3 class="title">Homeland market</h3>
     <el-button @click="show">{{item.name}}</el-button>
     <el-form-item>
 
       <span>ite name</span>
       <span>{{item.name}}</span>
+      <span>{{name1}}</span>
 
       <el-input
           v-model="item.name"
@@ -14,8 +17,10 @@
           placeholder="name"
           v-on:keyup.enter="handleLogin"
       >
+        {{item.name}}
         <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
       </el-input>
+
     </el-form-item>
     <el-form-item >
       <span>description</span>
@@ -89,8 +94,10 @@
           size="medium"
           type="primary"
           style="width:100%;"
-          v-on:click="addItem"
+          @click="addItem()"
       >
+
+
 
         <span v-if="!loading">Add item</span>
         <span v-else>signing in...</span>
@@ -103,9 +110,10 @@
 </template>
 
 <script>
-import {onMounted,ref} from 'vue'
+import {onMounted, reactive, ref} from 'vue'
 import {genFileId} from 'element-plus'
 import {itemAPI} from "@/api/item";
+import {cartAPI} from "@/api/cart";
 
 const imageUrl = ref('')
 const fd = new FileReader()
@@ -117,15 +125,15 @@ export default {
 
     return {
       codeUrl: "",
-      item: {
-        name: "a",
-        description: "",
-        region: "",
-        status: 0,
-        imageBase64: "",
-        price: 0,
-        quantity: 0
-      },
+      // item: {
+      //   name: "a",
+      //   description: "",
+      //   region: "",
+      //   status: 0,
+      //   imageBase64: "",
+      //   price: 0,
+      //   quantity: 0
+      // },
       loginForm: {
         username: "admin",
         password: "admin123",
@@ -143,9 +151,7 @@ export default {
 
       },
       loading: false,
-      // 验证码开关
       captchaEnabled: false,
-      // 注册开关
       register: false,
       redirect: undefined
     };
@@ -155,11 +161,11 @@ export default {
     show() {
       console.log(this.item.name)
     },
-    addItem(){
-      console.log("adding adding")
-      itemAPI.uploadItem(this.item)
-    }
-    ,
+    // addItem(){
+    //   console.log("adding adding")
+    //   itemAPI.uploadItem(this.item)
+    // }
+
     getFile (file, fileList){
       console.log("the image getfile starts ")
       console.log(file.raw)
@@ -195,22 +201,33 @@ export default {
 
 
   setup() {
-    let item1 = ref({
-      name: '',
-      testInfo: ''
+
+    const name1 = ref()
+
+    const item = reactive({
+      name: "",
+      description: "",
+      region: "",
+      status: 0,
+      imageBase64: "",
+      price: 0,
+      quantity: 0
     })
 
 
-    // const show = () => {
-    //   console.log("hah")
-    //   console.log("hah"+this.item.name)
-    // }
+
+    const addItem = () => {
+      console.log("adding adding")
+      itemAPI.uploadItem(item)
+    }
 
 
 
 
     return {
-      item1,
+      item,
+      name1,
+      addItem
       // region,
       // imageBase64,
       // getFile,

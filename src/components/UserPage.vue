@@ -2,22 +2,21 @@
   <div class="common-layout">
     <el-container class="top">
       <el-aside width="500px">
-        <img ref="imgShow" v-bind:src="item.imageBase64" alt="load error"
-             class="hovImg"/>
+
       </el-aside>
 
       <el-container class="main">
-        <el-header>{{ item.name }}</el-header>
+        <el-header>{{ user.name }}</el-header>
         <el-main>
           <ul>
             <pre class="pre" style="display:inline" >name:                 </pre>
-            <span class="text" v-if="isReadOnly" style="display:inline"> {{ item.name }} </span>
-            <el-input v-else v-bind:readonly="isReadOnly" v-model="item.name" style="display:inline"></el-input>
+            <span class="text" v-if="isReadOnly" style="display:inline"> {{ user.name }} </span>
+            <el-input v-else v-bind:readonly="isReadOnly" v-model="user.name" style="display:inline"></el-input>
             <br>
 
             <pre class="pre" style="display:inline">region:               </pre>
-            <span class="text" v-if="isReadOnly" style="display:inline"> {{ item.region }} </span>
-            <el-select v-else v-bind:readonly="isReadOnly" v-model="item.region" style="display:inline">
+            <span class="text" v-if="isReadOnly" style="display:inline"> {{ user.region }} </span>
+            <el-select v-else v-bind:readonly="isReadOnly" v-model="user.region" style="display:inline">
 
               <el-option v-for="(region,index) in regionList"
                          :label="region.value" :value="region.value"
@@ -27,36 +26,22 @@
               </el-option>
             </el-select>
             <br>
-            <pre class="pre" style="display:inline">category:             </pre>
-            <span class="text" v-if="isReadOnly" style="display:inline"> {{ item.category }} </span>
-            <el-select v-else v-bind:readonly="isReadOnly" v-model="item.category" style="display:inline">
+            <pre class="pre" style="display:inline">gender:             </pre>
+            <span class="text" v-if="isReadOnly" style="display:inline"> {{ user.gender }} </span>
 
-              <el-option v-for="(category,index) in categoryList"
-                         :label="category.value" :value="category.value"
-                         :key="category.key"
-                         style="display:inline"
-              >
-
-              </el-option>
-
-            </el-select>
             <br>
-            <pre class="pre" style="display:inline">description:          </pre>
-            <span class="text" v-if="isReadOnly" style="display:inline"> {{ item.description }} </span>
-            <el-input v-else v-bind:readonly="isReadOnly" v-model="item.description" type="textarea" style="display:inline"></el-input>
+            <pre class="pre" style="display:inline">gender:          </pre>
+            <span class="text" v-if="isReadOnly" style="display:inline"> {{ user.gender }} </span>
+            <el-input v-else v-bind:readonly="isReadOnly" v-model="user.gender" type="textarea" style="display:inline"></el-input>
             <br>
 
             <br>
-            <pre class="pre" style="display:inline">Price(EURO):           </pre>
-            <span class="text" v-if="isReadOnly" style="display:inline"> {{ item.price }} </span>
-            <el-input v-else v-bind:readonly="isReadOnly" v-model="item.price" style="display:inline"></el-input>
+            <pre class="pre" style="display:inline">phone:           </pre>
+            <span class="text" v-if="isReadOnly" style="display:inline"> {{ user.phone }} </span>
+            <el-input v-else v-bind:readonly="isReadOnly" v-model="user.price" style="display:inline"></el-input>
             <br>
-            <pre class="pre" style="display:inline">In stock:              </pre>
-            <span class="text" v-if="isReadOnly" style="display:inline"> {{ item.quantity }} </span>
-            <el-input v-else v-bind:readonly="isReadOnly" v-model="item.quantity" style="display:inline"></el-input>
-            <br>
-            <pre class="pre" style="display:inline">Another information:  </pre>
-            <br>
+
+
             <br>
 
           </ul>
@@ -94,18 +79,17 @@
 
 <script>
 
-import {itemAPI} from "@/api/item";
-import {cartAPI} from "@/api/cart";
+import {userAPI} from "@/api/user";
 import {useRoute} from "vue-router";
 
-// import{getItemInfo} from "@/api/item";
+// import{getuserInfo} from "@/api/user";
 // eslint-disable-next-line no-unused-vars
 import {onMounted, reactive, toRefs, watch} from "vue";
 import {ref} from "vue";
 import {integer} from "mockjs/src/mock/random/basic";
 
 export default {
-  name: "ItemPage",
+  name: "userPage",
   data() {
     const count1 = 0;
 
@@ -120,91 +104,46 @@ export default {
 
 
     let isReadOnly = ref(true)
-    let isAdmin = ref(false)
+    let isCustomer = ref(false)
 
-    let regionList = reactive([
-      {name: 'China', value: 'China', checked: true},
-      {name: 'Denmark', value: 'Denmark', checked: true},
-      {name: 'USA', value: 'USA', checked: true},
-      {name: 'Japan', value: 'Japan', checked: true},
-      {name: 'Korea', value: 'Korea', checked: true},
-      {name: 'Germany', value: 'Germany', checked: true}])
+    let user = reactive({
+      userId:Number,
+      username: String,
+      password: String,
+      region: String,
+      gender:String,
+      age:Number,
+      phone:String,
+      email:String,
 
-    let categoryList = reactive([
-      {name: 'healthcare', value: 'healthcare', checked: true},
-      {name: 'snack', value: 'snack', checked: true},
-      {name: 'clothing', value: 'clothing', checked: true},
-      {name: 'entertainment', value: 'entertainment', checked: true},
-      {name: 'cosmetic', value: 'cosmetic', checked: true},
-    ])
+    })
 
     const onLoad = ref(false)
     const imgShow = ref(null)
 
     const route = useRoute();
-
-    const pageName = route.query.itemName
+    const pageName = route.query.userName
 
     const getParams = () => {
       return route.params;
     }
 
-    let item = reactive({
-      name: String,
-      description: String,
-      region: String,
-      imageBase64: String,
-      quantity: Number,
-      price: Number,
-      status: Boolean,
-      category: String
 
-    })
-    let newItem = toRefs(item)
-
-    const datas = reactive({
-      values: [],
-    })
 
     const methods = {
       requestall() {
-        // const data = {
-        //   pageNum: 10,
-        //   pageSize: 5,
-        //   articieId: 100,
-        // };
-        // const nameparam = {
-        //   name: "cocacola"
-        // };
+
         console.log("pageName------------------------")
 
         console.log("pageName" + pageName)
-        itemAPI.getItemInfo(pageName).then(res => {
-              // item.value = res.data
-              item.name = res.data.name
-              item.description = res.data.description
-              item.region = res.data.region
-              item.imageBase64 = res.data.imageBase64
-              item.price = res.data.price
-              item.status = res.data.status
-              item.quantity = res.data.quantity
-              item.category = res.data.category
-              item.id = res.data.id
+        userAPI.getUserInfo(pageName).then(res => {
+          user.name = res.data.name
+          user.age=res.data.age
+          user.email=res.data.email
+          user.gender=res.data.gender
+          user.phone=res.data.gender
+          user.id = res.data.id
 
-
-              console.log("res " + res)
-              console.log("res.data " + res.data)
-              console.log("item de name is " + item.name)
-             console.log("item de quantity is " + item.quantity)
-              console.log("item. id" + item.itemId)
-              //
-              // console.log(cocacola1)
-              newItem = toRefs(item.value)
-              datas.value = res
-              console.log(res.data);
-              console.log(res.data.name);
-              console.log(res.data.description);
-              console.log(newItem.name)
 
               console.log("imgshow is " + imgShow.value)
             }
@@ -220,7 +159,7 @@ export default {
 
       updateConfirm() {
         isReadOnly.value = !isReadOnly.value
-        itemAPI.updateItemInfo(item)
+        userAPI.updateUserInfo(user)
       }
     }
 
@@ -234,19 +173,19 @@ export default {
       // setInterval(() => {
       //    count.value++
       // }, 1000)
-      if (sessionStorage.getItem('role') === "admin") {
-        console.log("store role is " + sessionStorage.getItem('role'))
-        isAdmin.value = true
+      if (sessionStorage.getuser('role') === "customer") {
+        console.log("store role is " + sessionStorage.getuser('role'))
+        isCustomer.value = true
       } else {
-        isAdmin.value = false
+        isCustomer.value = false
       }
       // isAdmin.value = false
-      console.log("on mounted get query " + route.query.itemName)
+      console.log("on mounted get query " + route.query.userName)
     });
 
 
     watch(count, (val, old) => {
-      if (count.value > item.inStock) {
+      if (count.value > user.inStock) {
         console.log("watch 已触发 new is ", val)
         alert('Not enough in stock')
         count.value = old
@@ -255,50 +194,11 @@ export default {
     })
 
 
-    const baby = ref('嘎嘎嘎')
-    // 定义年龄
-    const age = ref(28)
-
-    const add = () => {
-
-      if (count.value > item.inStock) {
-        alert('Not enough in stock')
-      } else {
-        count.value = count.value + 1;
-      }
-    }
-
-    const sub = () => {
-      if (count.value <= 0) {
-        alert('cannot be less')
-        this.count.value = 0;
-      }
-      console.log("oh,he is sub " + baby.value + " and " + age.value + "years")
-      count.value = count.value - 1;
-      console.log("count is " + count.value);
-    }
-
-    const addToCart = () => {
-      const itemQuantity = {
-        cartId: 1, itemName: item.name, itemId: item.itemId, quantity: count.value
-      }
-      console.log("adding to cart---------")
-      cartAPI.addToCart(itemQuantity)
-
-    }
-
 
     return {
-      regionList,
-      categoryList,
+      isCustomer,
+      user,
       isReadOnly,
-      isAdmin,
-      add,
-      sub,
-      addToCart,
-      imgShow,
-      item,
-      newItem,
       count,
       getParams,
       onLoad,
@@ -382,7 +282,7 @@ table thead tr {
   height: 60px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-users: center;
   text-align: center;
 }
 
@@ -411,7 +311,7 @@ table tbody tr {
   height: 100px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-users: center;
   text-align: center;
 }
 
@@ -422,14 +322,14 @@ table tbody tr td {
 table tbody tr td:nth-of-type(2) {
   flex: 3;
   display: flex;
-  align-items: center;
+  align-users: center;
   justify-content: space-evenly;
 }
 
 .settlement {
   display: flex;
   height: 80px;
-  align-items: center;
+  align-users: center;
   border-radius: 0 0 10px 10px;
   border: 1px solid rebeccapurple;
   justify-content: space-around;
