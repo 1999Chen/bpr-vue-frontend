@@ -6,7 +6,7 @@
           <thead>
           <tr>
             <td>
-              <el-checkbox v-model="checkAll" @click="methods.goCheckAll()" label="全选" size="large"/>
+              <el-checkbox v-model="checkAll" @click="methods.goCheckAll()" label="select all" size="large"/>
               <!--                <input type="checkbox" v-model="checkAll" @click="goCheckAll()"> 全选-->
             </td>
             <td>Item</td>
@@ -42,14 +42,14 @@
       </div>
       <div class="settlement" ref="drag">
         <div>
-          <el-checkbox v-model="checkAll" @click="methods.goCheckAll()" label="全选" size="large"/>
+          <el-checkbox v-model="checkAll" @click="methods.goCheckAll()" label="select all" size="large"/>
         </div>
         <el-button @click="methods.removeFromCart()">
           Remove
         </el-button>
-        <div>已选商品{{ totalnum }}</div>
+        <div>selected  {{ totalnum }}</div>
         <div>
-          合计 <span style="color: orangered;font-size: 20px">${{ totalprice }}</span>
+          total <span style="color: orangered;font-size: 20px">${{ totalprice }}</span>
         </div>
         <div>
           <el-button @click="dialogVisible = true">check out</el-button>
@@ -64,7 +64,7 @@
             <template #footer>
     <span class="dialog-footer">
       <el-button @click="dialogVisible = false">Not yet</el-button>
-      <el-button type="primary"  @click="methods.checkOut()">Yes</el-button>
+      <el-button type="primary"  @click="dialogVisible = false;methods.checkOut()">Yes</el-button>
     </span>
             </template>
           </el-dialog>
@@ -93,6 +93,7 @@ export default {
 
     const userId = ref(a);
     const cartId = ref(a)
+    let b = 0;
     const dialogVisible = ref(false)
     let data = reactive({
       //是否全选
@@ -112,7 +113,13 @@ export default {
 
       async getCartId(userId) {
         cartId.value = await cartAPI.getCartId(userId)
-        // cartId.value = 1
+        let z =await cartAPI.getCartId(userId)
+        b=JSON.stringify(z)[8]
+        b = parseInt(b)
+        // let b =a.get[0];
+        // cartId.value = parseInt(b)
+        console.log('getting cartID and cartId is '+b)
+
       },
 
       async getCartItems(cartId) {
@@ -151,27 +158,34 @@ export default {
         }
       },
 
-      removeFromCart() {
+      async removeFromCart() {
         console.log("removeFromCart")
         let removeList = ''
         cartList.forEach((item) => {
           if (item.checked) {
-            if (removeList.length===0) {
+            if (removeList.length === 0) {
               removeList += item.itemName
             } else {
               removeList += '@' + item.itemName
             }
           }
+
         })
-        cartAPI.removeItemsFromCart(1, removeList)
+        await cartAPI.removeItemsFromCart(b, removeList)
+        location.reload()
         console.log("removeList" + removeList)
-        this.getCartInfo(1)
+        this.getCartInfo(cartId.value)
+
       },
 
-      checkOut() {
-        cartAPI.checkOut(1)
-        orderAPI.addOrder(cartId,data.totalprice)
-        console.log("remove check out")
+      async checkOut() {
+        await cartAPI.checkOut(b)
+        await orderAPI.addOrder(b, data.totalprice)
+        cartAPI.generateNewCart(sessionStorage.getItem('userId')).then(res => {
+          console.log("remove check out new cart is "+res.data.cartId)
+        })
+
+        location.reload()
         dialogVisible.value = false
       },
 
@@ -208,14 +222,16 @@ export default {
     let numValue = ref(0)
 
     onMounted(async () => {
-
+      console.log("user ID IS "+ userId.value)
+      console.log("cart ID IS "+ cartId.value)
       userId.value = 1
       await methods.getCartId(userId.value)
       // cartId.value = 1
 
-      methods.getCartItems(cartId.value)
+      await methods.getCartItems(cartId.value)
       numValue = tbody.value.offsetHeight + tbody.value.offsetTop
-      //获取滚动条的高度
+      console.log("user ID IS "+ userId.value)
+      console.log("cart ID IS "+ cartId.value)
       // window.addEventListener('scroll',handleScroll,true)
     })
 
@@ -228,6 +244,7 @@ export default {
       methods,
       drag,
       tbody,
+      b
     }
 
   },

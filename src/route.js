@@ -11,6 +11,8 @@ import ErrorAuth from "@/components/error/ErrorAuth"
 import {store} from '@/store/store.js'
 import OrderPage from "@/components/subComponents/OrderPage.vue";
 import RegisterPage from "@/components/RegisterPage.vue";
+import RecommendPage from "@/components/RecommendPage.vue";
+import userPage from "@/components/UserPage.vue";
 
 
 const router = createRouter({
@@ -18,8 +20,8 @@ const router = createRouter({
     routes: [
         {
             path: "/",
-            component: HomePage,
-            meta: {requiresAuth: true}
+            component: LoginPage,
+            meta: {requiresAuth: false}
         },
         {
             path: "/homepage",
@@ -29,7 +31,7 @@ const router = createRouter({
         {
             path: "/mainpage",
             component: MainPage,
-            meta: {requiresAuth: false}
+            meta: {requiresAuth: true}
         },
         {
             path: "/loginpage",
@@ -64,7 +66,7 @@ const router = createRouter({
             path: "/testpage2",
             component: TestPage2,
             props: true,
-            meta: {requiresAuth: false}
+            meta: {requiresAuth: true, requiredAdmin: true}
         },
 
         {
@@ -80,7 +82,25 @@ const router = createRouter({
             component: ErrorAuth,
             props: true,
             meta: {requiresAuth: false}
+        },
+
+
+        {
+            path: "/RecommendPage",
+            component: RecommendPage,
+            props: true,
+            meta: {requiresAuth: true}
         }
+        ,
+
+
+        {
+            path: "/userPage",
+            component: userPage,
+            props: true,
+            meta: {requiresAuth: false}
+        }
+
     ]
 });
 
@@ -90,11 +110,12 @@ router.beforeEach((to, from, next) => {
 //   if (getAuth().currentUser)
 //
 // }
-
+    console.log('now the role is '+sessionStorage.getItem('role'))
     if (!to.meta.requiresAuth) {
         next()
-    } else if (!meta.requiredAdmin) {
+    } else if (!to.meta.requiredAdmin) {
         if (sessionStorage.getItem('role')!=null) {
+            console.log('now the role is '+sessionStorage.getItem('role'))
             next()
         } else next('/errorauth')
     } else {

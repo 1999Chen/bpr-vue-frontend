@@ -1,6 +1,6 @@
 <template>
 
-    <span class="text">you need sign in to come here!</span>
+    <span class="text">you dont have the authority to come here!</span>
 
 </template>
 

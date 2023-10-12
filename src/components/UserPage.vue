@@ -26,44 +26,32 @@
               </el-option>
             </el-select>
             <br>
-            <pre class="pre" style="display:inline">gender:             </pre>
-            <span class="text" v-if="isReadOnly" style="display:inline"> {{ user.gender }} </span>
 
-            <br>
-            <pre class="pre" style="display:inline">gender:          </pre>
-            <span class="text" v-if="isReadOnly" style="display:inline"> {{ user.gender }} </span>
-            <el-input v-else v-bind:readonly="isReadOnly" v-model="user.gender" type="textarea" style="display:inline"></el-input>
+
+
+            <pre class="pre" style="display:inline">email:          </pre>
+            <span class="text" v-if="isReadOnly" style="display:inline"> {{ user.email }} </span>
+            <el-input v-else v-bind:readonly="isReadOnly" v-model="user.email" type="textarea" style="display:inline"></el-input>
             <br>
 
             <br>
             <pre class="pre" style="display:inline">phone:           </pre>
             <span class="text" v-if="isReadOnly" style="display:inline"> {{ user.phone }} </span>
-            <el-input v-else v-bind:readonly="isReadOnly" v-model="user.price" style="display:inline"></el-input>
+            <el-input v-else v-bind:readonly="isReadOnly" v-model="user.phone" style="display:inline"></el-input>
             <br>
-
+            <br>
+            <pre class="pre" style="display:inline">address:          </pre>
+            <span class="text" v-if="isReadOnly" style="display:inline"> {{ user.address }} </span>
+            <el-input v-else v-bind:readonly="isReadOnly" v-model="user.address" type="textarea" style="display:inline"></el-input>
+            <br>
 
             <br>
 
           </ul>
         </el-main>
 
-        <div class="box" v-if="!isAdmin">
-          <ul id="car">
-            <li>number：</li>
-            <li>
-              <button @click="sub">-</button>
-            </li>
-            <li><input type="number" size="1" v-model="count"></li>
-            <li>
-              <button style="margin-right:50px; " @click="add">+</button>
-            </li>
-            <li>
-              <button @click="addToCart">Add to cart</button>
-            </li>
 
-          </ul>
-        </div>
-        <div v-else>
+        <div >
           <el-button v-if="isReadOnly" @click="methods.updateInfo()"> update info</el-button>
           <el-button v-else @click="methods.updateConfirm()"> confirm</el-button>
         </div>
@@ -105,16 +93,18 @@ export default {
 
     let isReadOnly = ref(true)
     let isCustomer = ref(false)
+    const username = ref('');
 
     let user = reactive({
-      userId:Number,
-      username: String,
+      id:Number,
+      name: String,
       password: String,
       region: String,
       gender:String,
       age:Number,
-      phone:String,
+      phone:Number,
       email:String,
+      address:String,
 
     })
 
@@ -133,19 +123,27 @@ export default {
     const methods = {
       requestall() {
 
-        console.log("pageName------------------------")
+        console.log("username------------------------")
 
-        console.log("pageName" + pageName)
-        userAPI.getUserInfo(pageName).then(res => {
-          user.name = res.data.name
+
+        username.value = sessionStorage.getItem('username')
+        console.log("username" + username.value)
+        userAPI.getUserInfo(username.value).then(res => {
+          user.name = res.data.username
           user.age=res.data.age
           user.email=res.data.email
           user.gender=res.data.gender
-          user.phone=res.data.gender
-          user.id = res.data.id
+          user.region=res.data.region
+          user.address=res.data.address
+          user.phone=res.data.phoneNumber
+          console.log("username" + user.name)
+          console.log("userage" + user.age)
+          console.log("useremail" + user.email)
+          console.log("user region" + user.region)
+          console.log("user phone" + user.phone)
 
 
-              console.log("imgshow is " + imgShow.value)
+
             }
         ).catch(err => {
           console.log(err)
@@ -173,8 +171,8 @@ export default {
       // setInterval(() => {
       //    count.value++
       // }, 1000)
-      if (sessionStorage.getuser('role') === "customer") {
-        console.log("store role is " + sessionStorage.getuser('role'))
+      if (sessionStorage.getItem('role') === "customer") {
+        console.log("store role is " + sessionStorage.getItem('role'))
         isCustomer.value = true
       } else {
         isCustomer.value = false
@@ -196,6 +194,7 @@ export default {
 
 
     return {
+      username,
       isCustomer,
       user,
       isReadOnly,

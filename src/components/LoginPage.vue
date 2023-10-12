@@ -40,8 +40,8 @@
 
         </el-button>
 
-        <div style="float: right;" v-if="register">
-          <router-link class="link-type" :to="'/register'">Sign up now!</router-link>
+        <div style="float: right;" >
+          <button @click="methods.goToRegisterPage()">Sign up now!</button>
         </div>
       </el-form-item>
     </el-form>
@@ -114,12 +114,21 @@ export default {
               methods.goToMainPage()
 
             }
+            else{
+              alert('username or password is not correct')
+            }
           })
       },
 
       async validateUserRole() {
         await userAPI.validateRole(loginParams.username).then(res => {
           sessionStorage.setItem('role',res.data);
+        })
+        await userAPI.getUserInfo(loginParams.username).then(res =>{
+          console.log("getting user id is"+res.data.userId)
+          sessionStorage.setItem('userId',res.data.userId)
+          console.log("getting user name is"+res.data.username)
+          sessionStorage.setItem('username',res.data.username)
         })
       },
 
@@ -142,7 +151,17 @@ export default {
           path: page_name,
 
         });
+      },
+
+      goToRegisterPage(){
+        let page_name = "/registerpage";
+
+        router.push({
+          path: page_name,
+
+        });
       }
+
     }
 
     onMounted(async () => {
@@ -217,10 +236,10 @@ export default {
 .el-login-footer {
   height: 40px;
   line-height: 40px;
-  position: fixed;
+  //position: fixed;
   bottom: 0;
   width: 100%;
-  text-align: center;
+  //text-align: center;
   color: #fff;
   font-family: Arial;
   font-size: 12px;

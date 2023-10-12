@@ -1,15 +1,18 @@
 <template>
   <div class="hello">
-    <router-link to="/Registerpage">Go Registerpage</router-link>
-    <router-link to="/testpage2">GO orders page</router-link>
-    <router-link to="/OrderPage">GO OrderPage</router-link>
-    <router-link to="/HomePage">GO homepage</router-link>
-    <router-link to="/MainPage">GO MainPage</router-link>
-    <router-link to="/LoginPage">GO LoginPage</router-link>
-    <router-link to="/ItemPage">GO item page</router-link>
-    <router-link to="/AddItemPage">GO add item page</router-link>
-    <router-link to="/CartPage">GO cart page</router-link>
-    <router-link to="/TestPage2">GO Search page</router-link>
+    <router-link class="head" to="/Registerpage">Register      </router-link>
+    <router-link class="head" to="/testpage2"> Orders    </router-link>
+    <router-link class="head" to="/MainPage"> MainPage     </router-link>
+
+<!--    <router-link to="/AddItemPage">GO add item page</router-link>-->
+    <router-link class="head" to="/CartPage"> Cart </router-link>
+<!--    <router-link to="/TestPage2">GO Search page</router-link>-->
+    <router-link class="head" to="/RecommendPage">Recommend</router-link>
+    <router-link class="head" to="/userPage">User profile</router-link>
+    <router-link class="login" to="/LoginPage"> Login</router-link>
+
+<br>
+    <br>
     <br>
     <br>
 
@@ -67,5 +70,19 @@ li {
 }
 a {
   color: #42b983;
+}
+.hello{
+  background: antiquewhite;
+}
+.login{
+  float:right;
+  background: #6b778c;
+}
+.head{
+  border-right: 10px;
+  margin-right: 60px;
+  font-family: Calibri;
+
+
 }
 </style>

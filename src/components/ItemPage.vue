@@ -51,10 +51,7 @@
             <span class="text" v-if="isReadOnly" style="display:inline"> {{ item.price }} </span>
             <el-input v-else v-bind:readonly="isReadOnly" v-model="item.price" style="display:inline"></el-input>
             <br>
-            <pre class="pre" style="display:inline">In stock:              </pre>
-            <span class="text" v-if="isReadOnly" style="display:inline"> {{ item.quantity }} </span>
-            <el-input v-else v-bind:readonly="isReadOnly" v-model="item.quantity" style="display:inline"></el-input>
-            <br>
+           <br>
             <pre class="pre" style="display:inline">Another information:  </pre>
             <br>
             <br>
@@ -95,7 +92,7 @@
 <script>
 
 import {itemAPI} from "@/api/item";
-import {cartAPI} from "@/api/cart";
+import {cartAPI as cart, cartAPI} from "@/api/cart";
 import {useRoute} from "vue-router";
 
 // import{getItemInfo} from "@/api/item";
@@ -168,14 +165,7 @@ export default {
 
     const methods = {
       requestall() {
-        // const data = {
-        //   pageNum: 10,
-        //   pageSize: 5,
-        //   articieId: 100,
-        // };
-        // const nameparam = {
-        //   name: "cocacola"
-        // };
+
         console.log("pageName------------------------")
 
         console.log("pageName" + pageName)
@@ -278,12 +268,18 @@ export default {
       console.log("count is " + count.value);
     }
 
-    const addToCart = () => {
+    const addToCart = async () => {
+      console.log(sessionStorage.getItem('userId'))
+      let a = await cartAPI.getCartId(sessionStorage.getItem('userId'))
+      console.log('add to cart id '+a.value)
+      console.log('add to cart id '+a.data)
+
       const itemQuantity = {
-        cartId: 1, itemName: item.name, itemId: item.itemId, quantity: count.value
+        cartId: a.data, itemName: item.name, itemId: item.id, quantity: count.value
       }
-      console.log("adding to cart---------")
+      console.log("adding to cart---------"+itemQuantity.cartId.value)
       cartAPI.addToCart(itemQuantity)
+      alert('added to cart!')
 
     }
 

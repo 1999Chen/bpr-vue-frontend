@@ -19,9 +19,7 @@ export const userAPI = {
             method: 'get',
             params: {username: username}
         })
-
     },
-
 
 
     async validateRole(username) {
@@ -43,13 +41,24 @@ export const userAPI = {
     },
 
 
-    async registerUser(username,password) {
+    async registerUser(user) {
         return await axios({
             url: "user/registerUser",
-            method: 'get',
-            params: {username: username,password:password}
+            method: 'post',
+            data: user
         })
 
     },
+
+
+    async  getPrediction(queryParams) {
+        return await axios({
+            url: "user/getPrediction",
+            method: 'get',
+            params: {age: queryParams.age,gender:queryParams.gender,region:queryParams.region}
+        })
+    },
+
+
 
 }

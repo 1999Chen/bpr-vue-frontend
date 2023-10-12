@@ -33,13 +33,13 @@
         <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
       </el-input>
     </el-form-item>
-    <el-form-item>
-      <el-checkbox v-model="item.status" style="margin:0px 0px 25px 0px;"
-                   :true-label=1  :false-label=0
-      >
-        in stock
-      </el-checkbox>
-    </el-form-item>
+<!--    <el-form-item>-->
+<!--      <el-checkbox v-model="item.status" style="margin:0px 0px 25px 0px;"-->
+<!--                   :true-label=1  :false-label=0-->
+<!--      >-->
+<!--        in stock-->
+<!--      </el-checkbox>-->
+<!--    </el-form-item>-->
     <el-form-item prop="region">
       <span>region</span>
       <el-select v-model="item.region" placeholder="please pick one region">
@@ -52,8 +52,14 @@
         <el-option value="DK">
           <span>DK</span>
         </el-option>
-        <el-option value="RO">
-          <span>RO</span>
+        <el-option value="Germany">
+          <span>Germany</span>
+        </el-option>
+        <el-option value="Korea">
+          <span>Korea</span>
+        </el-option>
+        <el-option value="Japan">
+          <span>Japan</span>
         </el-option>
       </el-select>
 
@@ -67,12 +73,12 @@
 
     </el-form-item>
 
-    <el-form-item style="width:100%;">
-      <span>quantity</span>
-      <el-input-number v-model="item.quantity" oninput="value=value.replace(/[^0-9.]/g,'')"></el-input-number>
-      <span slot="suffix">/ Euro </span>
+<!--    <el-form-item style="width:100%;">-->
+<!--      <span>quantity</span>-->
+<!--      <el-input-number v-model="item.quantity" oninput="value=value.replace(/[^0-9.]/g,'')"></el-input-number>-->
+<!--      <span slot="suffix">/ Euro </span>-->
 
-    </el-form-item>
+<!--    </el-form-item>-->
 
 
     <el-form-item style="width:100%;">
@@ -97,9 +103,7 @@
           @click="addItem()"
       >
 
-
-
-        <span v-if="!loading">Add item</span>
+     <span v-if="!loading">Add item</span>
         <span v-else>signing in...</span>
       </el-button>
       <div style="float: right;" v-if="register">

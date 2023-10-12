@@ -1,80 +1,14 @@
 <template>
-  <el-container class="content-container" direction="vertical"   style="background: beige;">
 
-
-    <div class="top">
-      <!-- 表单输入框开始 -->
-      <el-form ref="ruleFormRef" label-width="120px" class="input-form"
-               status-icon>
-        <el-form-item label="item name" prop="name">
-          <el-input v-model="queryParams.keyword"/>
-        </el-form-item>
-
-
-        <el-form-item label="item region" prop="payTime">
-          <el-button
-              v-model="checkAllRegion"
-              @click="handlecheckAllRegion"
-              class="checkbox"
-          >Mark all regions
-          </el-button>
-
-          <el-checkbox
-              v-for="(region, index) in regionList"
-              :key="region.name"
-              :label="region.name"
-              v-model="region.checked"
-              @click="goCheckRegion(region)"
-          >
-            {{ region.name }}
-          </el-checkbox>
-        </el-form-item>
-
-
-        <el-form-item label="item region" prop="payTime">
-
-          <el-button
-              v-model="checkAllCategory"
-              @click="handlecheckAllCategory"
-              class="checkbox"
-          >Mark all categories
-          </el-button>
-
-          <el-checkbox
-              v-for="(category, index) in categoryList"
-              :key="category.name"
-              :label="category.name"
-              v-model="category.checked"
-              @click="goCheckRegion(region)"
-          >
-            {{ category.name }}
-          </el-checkbox>
-        </el-form-item>
-
-
-      </el-form>
-      <!-- 表单输入框结束 -->
-
-      <!-- 表单按钮组开始 -->
-      <div class="btns">
-        <el-button type="primary" @click="search">search</el-button>
-        <el-button type="primary"  @click="change" v-if="isAdmin">add a new item</el-button>
-      </div>
-      <!-- 表单按钮组结束 -->
-    </div>
-
-    <!-- 表格开始 -->
-    <div class="table">
-      <!-- 表格 -->
-
-
-      <!-- 分页 -->
-      <el-pagination background layout="prev, pager, next" :total="dataTotal" hide-on-single-page/>
-    </div>
-    <!-- 表格结束 -->
-  </el-container>
-
+  <div>
+    <br>
+    <br>
+    <span class="top"> New recommendations for you based on big data</span>
+    <br>
+    <br>
+  </div>
   <div v-if="onLoad">
+    <br>
     <el-row>
       <el-col :span="4" v-for="item in itemList" :key="item" :offset="1">
         <div class="img">
@@ -102,6 +36,7 @@
     </el-row>
   </div>
   <li><input type="text" size="1" v-model="count"></li>
+
 </template>
 
 <script>
@@ -113,7 +48,7 @@ import {store} from '@/store/store.js'
 import {userAPI} from "@/api/user";
 
 export default {
-  name: "MainPage",
+  name: "RecommendPage",
   methods: {options},
 
   setup() {
@@ -136,9 +71,9 @@ export default {
 
     let queryParams = reactive(
         {
-          keyword: '',
-          regions: '',
-          categories: ''
+          age: 0,
+          gender: 0,
+          region: ''
         })
 
     let regionList = reactive([
@@ -213,12 +148,12 @@ export default {
       })
     }
     const deleteItem = async (itemName) => {
-          console.log('now page is '+state.currentPage)
-          await itemAPI.removeItem(itemName),
+      console.log('now page is '+state.currentPage)
+      await itemAPI.removeItem(itemName),
           await request()
-          queryTableData()
-          handlehCurrentChange(state.currentPage)
-          console.log('now page is '+state.currentPage)
+      queryTableData()
+      handlehCurrentChange(state.currentPage)
+      console.log('now page is '+state.currentPage)
 
     }
 
@@ -226,7 +161,17 @@ export default {
       // let itemList = []
       itemList.length = 0
 
-      await itemAPI.getAllItems().then(res => {
+
+      await userAPI.getUserInfo(sessionStorage.getItem('username')).then(res =>{
+        console.log("now user region is "+res.data.region)
+        console.log("now user age is "+res.data.age)
+        console.log("now user gender is "+res.data.gender)
+        queryParams.age=res.data.age
+        queryParams.gender=res.data.gender
+        queryParams.region=res.data.region
+      })
+
+      await userAPI.getPrediction(queryParams).then(res => {
             for (let item of res.data) {
               itemList.push(item)
             }
@@ -390,8 +335,16 @@ export default {
 
 .table {
   color: #fcdcdc;
+
 }
 
+.top{
+  border-top:1px solid #000;
+  font-family: Comic Sans MS,sans-serif;
+  font-style:italic;
+  font-size:150%;
+  border-bottom:2px dashed #F00
+}
 .el-card-define {
   /*min-height: 100%;*/
   height: 400px;

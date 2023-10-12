@@ -9,6 +9,7 @@
             type="text"
             auto-complete="off"
             placeholder="username"
+            v-on:input="methods.checkInput()"
         >
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
         </el-input>
@@ -20,34 +21,37 @@
             type="password"
             auto-complete="off"
             placeholder="password"
+            v-on:input="methods.checkInput()"
 
         >
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon"/>
         </el-input>
       </el-form-item>
 
-      <el-form-item prop="username">
+      <el-form-item prop="gender">
         <el-select
             v-model="registerParams.gender"
             type="text"
             auto-complete="off"
             placeholder="gender"
+            v-on:input="methods.checkInput()"
         >
-          <el-option>Male</el-option>
-          <el-option>Female</el-option>
+          <el-option value="male">Male</el-option>
+          <el-option value="female">Female</el-option>
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
         </el-select>
 
       </el-form-item>
-      <el-form-item prop="username">
+      <el-form-item prop="age">
         <el-input
             v-model="registerParams.age"
             type="text"
             auto-complete="off"
-            placeholder="age"
-        >
+            placeholder="age(please input numbers)"
+            oninput="value=value.replace(/[^0-9.]/g,'')"
+            v-on:input="methods.checkInput()"/>
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
-        </el-input>
+
 
       </el-form-item>
       <el-form-item prop="region">
@@ -56,23 +60,26 @@
             type="text"
             auto-complete="off"
             placeholder="region"
+            v-on:input="methods.checkInput()"
         >
-          <el-option>China</el-option>
-          <el-option>Denmark</el-option>
-          <el-option>USA</el-option>
-          <el-option>Germany</el-option>
-          <el-option>Korea</el-option>
-          <el-option>Japan</el-option>
+          <el-option value="USA">USA</el-option>
+          <el-option value="China">China</el-option>
+          <el-option value="Denmark">Denmark</el-option>
+          <el-option value="Germany">Germany</el-option>
+          <el-option value="Korea">Korea</el-option>
+          <el-option value="Japan">Japan</el-option>
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
         </el-select>
 
       </el-form-item>
-      <el-form-item prop="username">
+      <el-form-item prop="phone">
         <el-input
             v-model="registerParams.phone"
             type="text"
             auto-complete="off"
-            placeholder="phone"
+            placeholder="phone(please input numbers)"
+            oninput="value=value.replace(/[^0-9.]/g,'')"
+            v-on:input="methods.checkInput()"
         >
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
         </el-input>
@@ -84,18 +91,20 @@
             type="text"
             auto-complete="off"
             placeholder="address"
+            v-on:input="methods.checkInput()"
         >
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
         </el-input>
 
       </el-form-item>
 
-      <el-form-item prop="address">
+      <el-form-item prop="email">
         <el-input
             v-model="registerParams.email"
             type="text"
             auto-complete="off"
             placeholder="email"
+            v-on:input="methods.checkInput()"
         >
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
         </el-input>
@@ -109,6 +118,8 @@
             type="primary"
             style="width:100%;"
             @click="methods.registerUser()"
+            :disabled="isEmpty"
+
         >
 
           <span >Sign up</span>
@@ -150,12 +161,12 @@ export default {
       //   uuid: ""
       // },
       registerRules: {
-        username: [
-          {required: true, trigger: "blur", message: "please input username"}
-        ],
-        password: [
-          {required: true, trigger: "blur", message: "please input password"}
-        ],
+        // username: [
+        //   {required: true, trigger: "blur", message: "please input username"}
+        // ],
+        // password: [
+        //   {required: true, trigger: "blur", message: "please input password"}
+        // ],
 
       },
       loading: false,
@@ -171,6 +182,7 @@ export default {
   setup(){
 
     let isSigned = ref(false);
+    let isEmpty  =  ref(false);
     let router = useRouter();
     const registerParams = reactive({
       username: "",
@@ -205,14 +217,40 @@ export default {
         })
       },
 
+        checkInput() {
+        console.log(registerParams)
+
+        if (registerParams.gender=='' || registerParams.username=='' || registerParams.password=='' ||
+            registerParams.age=='' || registerParams.email=='' || registerParams.address==''||
+            registerParams.phone=='' || registerParams.region==''){
+          console.log('something is empty')
+          isEmpty.value = true
+        }
+
+        else
+          isEmpty.value = false
+
+        console.log(isEmpty.value)
+        },
+
       async registerUser() {
 
-        await userAPI.registerUser(registerParams.username,registerParams.password).then(async res => {
+        console.log("register user "+registerParams)
+        if (registerParams.gender=='male')
+          registerParams.gender=1
+        else
+          registerParams.gender=0
+
+        await userAPI.registerUser(registerParams).then(async res => {
           if (res.data === 1) {
-            await userAPI.getUserInfo(registerParams.username).then(async res1 => {
+
+             await userAPI.getUserInfo(registerParams.username).then(async res1 => {
               await cartAPI.generateNewCart(res1.data.userId)
               isSigned.value = true;
             })
+          }
+          else {
+            alert('username already registered')
           }
         })
       },
@@ -234,6 +272,7 @@ export default {
     })
 
     return {
+      isEmpty,
       isSigned,
       registerParams,
       methods
